@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ôn tập Lập trình PHP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8;min-height:100vh;color:#1a1a1a}
+#app{max-width:960px;margin:0 auto;padding:1.5rem 1rem}
+h1{font-size:26px;font-weight:600;color:#1a1a1a;margin-bottom:6px}
+.subtitle{font-size:14px;color:#666;margin-bottom:1.5rem}
+.chapters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.ch-card{background:#fff;border:1px solid #e0e0e0;border-radius:14px;padding:1.25rem;cursor:pointer;transition:border-color .2s,transform .15s,box-shadow .2s}
+.ch-card:hover{border-color:#1D9E75;transform:translateY(-2px);box-shadow:0 4px 16px rgba(29,158,117,.12)}
+.ch-badge{display:inline-block;font-size:11px;font-weight:600;background:#E1F5EE;color:#0F6E56;padding:3px 12px;border-radius:20px;margin-bottom:10px;letter-spacing:.3px}
+.ch-title{font-size:15px;font-weight:600;color:#1a1a1a;line-height:1.4;margin-bottom:6px}
+.ch-meta{font-size:12px;color:#888}
+.quiz-wrap{padding:0}
+.quiz-nav{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;background:#fff;padding:12px 16px;border-radius:12px;border:1px solid #e0e0e0}
+.nav-btn{background:transparent;border:1px solid #d0d0d0;border-radius:8px;padding:6px 14px;font-size:13px;color:#555;cursor:pointer;transition:background .15s}
+.nav-btn:hover{background:#f5f5f5}
+.quiz-title{font-size:14px;font-weight:600;color:#1a1a1a;flex:1;text-align:center}
+.quiz-body{display:grid;grid-template-columns:1fr 210px;gap:16px;align-items:start}
+@media(max-width:640px){.quiz-body{grid-template-columns:1fr}.sidebar{display:none}}
+.q-card{background:#fff;border:1px solid #e0e0e0;border-radius:14px;padding:1.5rem}
+.q-num{font-size:12px;color:#1D9E75;font-weight:600;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.q-level{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;margin-bottom:14px}
+.lvl-nb{background:#E6F1FB;color:#185FA5}
+.lvl-th{background:#EAF3DE;color:#3B6D11}
+.lvl-vd{background:#FAEEDA;color:#854F0B}
+.q-text{font-size:16px;color:#1a1a1a;line-height:1.65;margin-bottom:1.25rem;font-weight:500}
+.options{display:flex;flex-direction:column;gap:9px}
+.opt-btn{background:#f8f9fa;border:1.5px solid #e8e8e8;border-radius:10px;padding:11px 16px;text-align:left;font-size:14px;color:#333;cursor:pointer;transition:all .15s;line-height:1.5}
+.opt-btn:hover:not([disabled]){background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.opt-btn.correct{background:#EAF3DE;border-color:#3B6D11;color:#1a3d0f;font-weight:600}
+.opt-btn.wrong{background:#FCEBEB;border-color:#A32D2D;color:#4a1010}
+.feedback{margin-top:14px;font-size:13px;padding:10px 14px;border-radius:10px;line-height:1.5}
+.fb-correct{background:#EAF3DE;color:#2d6b12;border:1px solid #c0dd97}
+.fb-wrong{background:#FCEBEB;color:#8b1f1f;border:1px solid #f7c1c1}
+.q-controls{display:flex;justify-content:space-between;margin-top:1.5rem;gap:10px}
+.ctrl-btn{padding:9px 20px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid #d0d0d0;background:transparent;color:#555;transition:all .15s}
+.ctrl-btn:hover:not([disabled]){background:#f0f0f0}
+.ctrl-btn.primary{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.ctrl-btn.primary:hover{background:#0F6E56}
+.ctrl-btn:disabled{opacity:.35;cursor:not-allowed}
+.sidebar{background:#fff;border:1px solid #e0e0e0;border-radius:14px;padding:1.1rem;position:sticky;top:16px}
+.sidebar h3{font-size:12px;font-weight:600;color:#888;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.q-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px}
+.q-dot{width:30px;height:30px;border-radius:7px;border:1.5px solid #e0e0e0;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#999;background:#f8f9fa;transition:all .15s}
+.q-dot.active{border-color:#1D9E75;color:#1D9E75;background:#E1F5EE}
+.q-dot.done-c{background:#EAF3DE;border-color:#3B6D11;color:#3B6D11}
+.q-dot.done-w{background:#FCEBEB;border-color:#A32D2D;color:#A32D2D}
+.submit-btn{width:100%;padding:11px;background:#1D9E75;border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.submit-btn:hover{background:#0F6E56}
+.result-wrap{display:flex;justify-content:center;align-items:flex-start;padding:2rem 0}
+.result-card{background:#fff;border:1px solid #e0e0e0;border-radius:16px;padding:2rem;max-width:480px;width:100%}
+.result-score{font-size:56px;font-weight:700;color:#1D9E75;text-align:center;margin:1rem 0 4px}
+.result-sub{font-size:15px;color:#555;text-align:center;margin-bottom:1.5rem}
+.result-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.stat-box{background:#f8f9fa;border-radius:10px;padding:14px;text-align:center;border:1px solid #eee}
+.stat-n{font-size:22px;font-weight:700}
+.stat-l{font-size:12px;color:#888;margin-top:3px}
+.result-actions{display:flex;gap:10px}
+.result-actions button{flex:1;padding:11px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:1.5px solid #d0d0d0;background:transparent;color:#555;transition:all .15s}
+.result-actions button:hover{background:#f0f0f0}
+.result-actions .btn-retry{background:#1D9E75;border-color:#1D9E75;color:#fff}
+.result-actions .btn-retry:hover{background:#0F6E56}
+.progress-bar{height:4px;background:#e0e0e0;border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.progress-fill{height:100%;background:#1D9E75;border-radius:2px;transition:width .3s}
+</style>
+</head>
+<body>
+<div id="app"><div id="screen"></div></div>
+<script>
+const DATA = {
+  chapters: [
+    {
+      id:1,
+      title:"Tổng quan về PHP & Cú pháp cơ bản",
+      questions:[
+        {q:"PHP là viết tắt của cụm từ nào?",opts:["Personal Home Page","PHP: Hypertext Preprocessor","Portable Hypertext Processor","Private Hypertext Protocol"],ans:1,level:"nb"},
+        {q:"PHP được thực thi ở đâu?",opts:["Trình duyệt (client-side)","Máy chủ (server-side)","Cả hai phía","Không bên nào"],ans:1,level:"nb"},
+        {q:"Thẻ mở của PHP là gì?",opts:["<php>","<?php","<script>","<%"],ans:1,level:"nb"},
+        {q:"Biến trong PHP được khai báo bắt đầu bằng ký tự nào?",opts:["@","#","$","&"],ans:2,level:"nb"},
+        {q:"Kiểu dữ liệu nào sau đây KHÔNG phải kiểu scalar trong PHP?",opts:["int","float","array","string"],ans:2,level:"nb"},
+        {q:"Hằng số trong PHP được định nghĩa bằng hàm nào?",opts:["var()","const()","define()","set()"],ans:2,level:"nb"},
+        {q:"Toán tử nào dùng để nối chuỗi trong PHP?",opts:["+","&",".","||"],ans:2,level:"nb"},
+        {q:"Câu lệnh nào dùng để in ra màn hình trong PHP?",opts:["print_r","console.log","echo","printf_out"],ans:2,level:"nb"},
+        {q:"Mảng liên kết (associative array) trong PHP sử dụng gì làm chỉ số?",opts:["Số nguyên","Chuỗi","Cả hai","Không dùng chỉ số"],ans:1,level:"nb"},
+        {q:"Vòng lặp nào phù hợp nhất để duyệt qua một mảng PHP?",opts:["for","while","foreach","do...while"],ans:2,level:"nb"},
+        {q:"Cú pháp đúng để khai báo hàm trong PHP là gì?",opts:["function myFunc(){}","def myFunc():","void myFunc(){}","func myFunc(){}"],ans:0,level:"nb"},
+        {q:"Phần mở rộng file PHP là gì?",opts:[".html",".php",".asp",".js"],ans:1,level:"nb"},
+        {q:"NULL trong PHP có nghĩa là gì?",opts:["Giá trị 0","Chuỗi rỗng","Biến chưa có giá trị","Lỗi"],ans:2,level:"nb"},
+        {q:"Hàm strlen() trong PHP trả về gì?",opts:["Chuỗi viết hoa","Độ dài chuỗi","Vị trí ký tự","Chuỗi ngược"],ans:1,level:"nb"},
+        {q:"Hàm array_push() dùng để làm gì?",opts:["Xóa phần tử cuối mảng","Thêm phần tử vào cuối mảng","Sắp xếp mảng","Đếm phần tử mảng"],ans:1,level:"nb"},
+        {q:"Trong mô hình Client-Server, PHP nằm ở tầng nào?",opts:["Client","Server","Database","Cả Client và Server"],ans:1,level:"nb"},
+        {q:"XAMPP là công cụ dùng để làm gì?",opts:["Tạo website tĩnh","Cài đặt môi trường phát triển PHP local","Quản lý domain","Thiết kế giao diện"],ans:1,level:"nb"},
+        {q:"$_SERVER['DOCUMENT_ROOT'] trả về thông tin gì?",opts:["Tên domain","Đường dẫn thư mục gốc của website trên server","IP của server","Phiên bản PHP"],ans:1,level:"nb"},
+        {q:"Toán tử === trong PHP kiểm tra điều gì?",opts:["Chỉ giá trị","Chỉ kiểu dữ liệu","Cả giá trị lẫn kiểu","Không kiểm tra gì"],ans:2,level:"th"},
+        {q:"Sự khác biệt giữa mảng indexed và associative là gì?",opts:["Indexed nhanh hơn","Indexed dùng số nguyên, associative dùng chuỗi làm key","Associative chỉ lưu số","Không có sự khác biệt"],ans:1,level:"th"},
+        {q:"Khi nào nên dùng switch thay vì if...else?",opts:["Luôn luôn","Khi so sánh một biến với nhiều giá trị cụ thể","Khi cần so sánh khoảng giá trị","Khi điều kiện phức tạp"],ans:1,level:"th"},
+        {q:"Hàm explode() trong PHP làm gì?",opts:["Nối các chuỗi lại","Tách chuỗi thành mảng theo dấu phân cách","Đảo ngược chuỗi","Tìm kiếm trong chuỗi"],ans:1,level:"th"},
+        {q:"Giá trị của $a sau đoạn code: $a = 5; $a += 3; là bao nhiêu?",opts:["5","3","8","15"],ans:2,level:"th"},
+        {q:"Tại sao PHP được gọi là ngôn ngữ loosely typed?",opts:["PHP không có kiểu dữ liệu","PHP tự động chuyển đổi kiểu dữ liệu khi cần","PHP chỉ dùng kiểu string","PHP không hỗ trợ số nguyên"],ans:1,level:"th"},
+        {q:"Hàm implode() làm gì trong PHP?",opts:["Tách chuỗi","Nối các phần tử mảng thành chuỗi","Sắp xếp mảng","Tìm phần tử trong mảng"],ans:1,level:"th"},
+        {q:"Phân biệt Static Website và Dynamic Website: điểm khác biệt chính là gì?",opts:["Dynamic web nhanh hơn","Dynamic web tạo nội dung theo yêu cầu, static thì không","Static web dùng PHP","Dynamic web không cần server"],ans:1,level:"th"},
+        {q:"Trong chu trình Request/Response, sau khi PHP xử lý xong, kết quả được gửi về dưới dạng nào?",opts:["File PHP","HTML thuần","File binary","JSON"],ans:1,level:"th"},
+        {q:"Hàm sort() trong PHP sắp xếp mảng theo thứ tự nào?",opts:["Ngẫu nhiên","Tăng dần","Giảm dần","Theo alphabet ngược"],ans:1,level:"th"},
+        {q:"Cho $arr = [3,1,4,1,5]; count($arr) trả về giá trị nào?",opts:["3","4","5","6"],ans:2,level:"vd"},
+        {q:"Hàm nào phù hợp để kiểm tra xem một chuỗi có chứa chuỗi con hay không?",opts:["strlen()","strpos()","str_replace()","substr()"],ans:1,level:"vd"},
+        {q:"Cho $s = 'Hello World'; strtolower($s) trả về gì?",opts:["HELLO WORLD","hello world","Hello World","Hello world"],ans:1,level:"vd"},
+        {q:"Cách nào đúng để tạo mảng đa chiều trong PHP?",opts:["$a = [[1,2],[3,4]]","$a = {1,2,3}","$a = array(array())","Cả A và C đều đúng"],ans:3,level:"vd"},
+        {q:"Hàm array_merge() khác array_push() ở điểm nào?",opts:["Không khác gì","array_merge nối hai mảng lại, array_push thêm phần tử","array_merge xóa phần tử","array_push nối mảng"],ans:1,level:"vd"},
+        {q:"Trong PHP, do...while khác while ở điểm nào?",opts:["Không khác gì","do...while chạy ít nhất một lần dù điều kiện sai","while nhanh hơn","do...while không có điều kiện"],ans:1,level:"vd"},
+        {q:"Hàm str_replace('a','b','banana') trả về gì?",opts:["bbnbnb","bbnbnb","bbnbnb","bbnbnb"],ans:0,level:"vd"},
+        {q:"Để lấy 3 ký tự đầu của chuỗi $s, dùng hàm nào?",opts:["substr($s,0,3)","strpos($s,3)","strlen($s,3)","str_split($s,3)"],ans:0,level:"vd"},
+        {q:"Kết quả của var_dump(true) là gì?",opts:["1","bool(true)","true","string"],ans:1,level:"vd"},
+        {q:"Tại sao nên dùng hằng số (define) thay vì biến cho các giá trị cố định?",opts:["Tốc độ nhanh hơn","Tránh thay đổi giá trị vô tình, code rõ ràng hơn","Không cần ký tự $","Tất cả đều đúng"],ans:3,level:"vd"},
+        {q:"Hàm array_slice($arr, 1, 3) lấy ra bao nhiêu phần tử?",opts:["1","3","4","2"],ans:1,level:"vd"},
+        {q:"Cho $a = '5'; $b = 5; var_dump($a == $b) trả về gì?",opts:["bool(false)","bool(true)","int(1)","NULL"],ans:1,level:"vd"},
+      ]
+    },
+    {
+      id:2,
+      title:"Xử lý Form và Quản lý trạng thái",
+      questions:[
+        {q:"Siêu biến nào chứa dữ liệu gửi từ form dùng method POST?",opts:["$_GET","$_POST","$_REQUEST","$_FORM"],ans:1,level:"nb"},
+        {q:"Phương thức GET gửi dữ liệu như thế nào?",opts:["Trong body của request","Qua URL","Qua cookie","Qua session"],ans:1,level:"nb"},
+        {q:"Cookie được lưu ở đâu?",opts:["Máy chủ","Database","Trình duyệt của người dùng","File server"],ans:2,level:"nb"},
+        {q:"Session trong PHP được lưu ở đâu mặc định?",opts:["Trình duyệt","Database","Máy chủ","Cookie"],ans:2,level:"nb"},
+        {q:"Hàm nào dùng để bắt đầu một session trong PHP?",opts:["session_start()","start_session()","session_begin()","init_session()"],ans:0,level:"nb"},
+        {q:"Siêu biến nào chứa thông tin về file được upload?",opts:["$_POST","$_FILES","$_SERVER","$_ENV"],ans:1,level:"nb"},
+        {q:"Hàm move_uploaded_file() dùng để làm gì?",opts:["Xóa file upload","Di chuyển file từ thư mục tạm sang thư mục đích","Đọc nội dung file","Nén file"],ans:1,level:"nb"},
+        {q:"Hàm setcookie() phải được gọi trước hay sau khi xuất HTML?",opts:["Sau","Trước","Không quan trọng","Cùng lúc"],ans:1,level:"nb"},
+        {q:"$_REQUEST chứa dữ liệu từ nguồn nào?",opts:["Chỉ POST","Chỉ GET","GET, POST và COOKIE","Chỉ SESSION"],ans:2,level:"nb"},
+        {q:"Hàm trim() trong PHP dùng để làm gì?",opts:["Cắt chuỗi ở vị trí bất kỳ","Xóa khoảng trắng đầu và cuối chuỗi","Đếm ký tự","Chuyển thành chữ hoa"],ans:1,level:"nb"},
+        {q:"Siêu biến $_SERVER['REQUEST_METHOD'] trả về giá trị gì khi dùng form POST?",opts:["GET","POST","SUBMIT","FORM"],ans:1,level:"nb"},
+        {q:"Hàm filter_var() với FILTER_VALIDATE_EMAIL dùng để làm gì?",opts:["Gửi email","Kiểm tra định dạng email hợp lệ","Mã hóa email","Xóa ký tự đặc biệt trong email"],ans:1,level:"nb"},
+        {q:"$_SESSION['user'] = 'admin' lưu giá trị này ở đâu?",opts:["Cookie trình duyệt","URL","Bộ nhớ server","Database"],ans:2,level:"nb"},
+        {q:"Phương thức GET có giới hạn dung lượng dữ liệu hay không?",opts:["Không giới hạn","Có, do giới hạn độ dài URL","Chỉ giới hạn bởi RAM","Giới hạn 100MB"],ans:1,level:"nb"},
+        {q:"Hàm session_destroy() làm gì?",opts:["Tạm dừng session","Xóa toàn bộ dữ liệu session","Đổi session ID","Lưu session vào DB"],ans:1,level:"nb"},
+        {q:"$_SERVER['DOCUMENT_ROOT'] trả về thông tin gì?",opts:["Tên domain","Đường dẫn thư mục gốc của website trên server","IP của server","Phiên bản PHP"],ans:1,level:"nb"},
+        {q:"Ưu điểm chính của POST so với GET khi gửi form là gì?",opts:["Nhanh hơn","Dữ liệu không hiển thị trên URL, bảo mật hơn","Không cần server","Lưu được vào bookmark"],ans:1,level:"th"},
+        {q:"Tại sao cần validation dữ liệu từ form trước khi xử lý?",opts:["Để làm code dài hơn","Ngăn chặn dữ liệu không hợp lệ và tấn công","Tăng tốc độ tải trang","Để dùng được POST"],ans:1,level:"th"},
+        {q:"Sự khác biệt giữa Cookie và Session là gì?",opts:["Không có sự khác biệt","Cookie lưu ở trình duyệt, Session lưu ở server","Session nhanh hơn Cookie","Cookie an toàn hơn Session"],ans:1,level:"th"},
+        {q:"stripslashes() được dùng để làm gì khi xử lý form?",opts:["Thêm dấu gạch chéo","Xóa dấu gạch chéo được thêm tự động bởi magic_quotes","Cắt chuỗi","Mã hóa dữ liệu"],ans:1,level:"th"},
+        {q:"Tại sao không nên dùng GET để gửi mật khẩu?",opts:["GET chậm hơn","Mật khẩu sẽ hiển thị trên URL, không an toàn","GET không hỗ trợ chuỗi","Server từ chối GET"],ans:1,level:"th"},
+        {q:"Khi upload file, lỗi UPLOAD_ERR_NO_FILE có nghĩa là gì?",opts:["File quá lớn","Không có file nào được chọn để upload","Lỗi kết nối","Thư mục đích không tồn tại"],ans:1,level:"th"},
+        {q:"Session ID được truyền giữa client và server bằng cách nào mặc định?",opts:["URL query string","Cookie","Hidden form field","HTTP Header tùy chỉnh"],ans:1,level:"th"},
+        {q:"Để kiểm tra một session biến có tồn tại không, dùng hàm nào?",opts:["session_check()","isset($_SESSION['key'])","exists_session()","session_has()"],ans:1,level:"th"},
+        {q:"$_SERVER['HTTP_REFERER'] chứa thông tin gì?",opts:["IP của server","URL trang mà người dùng đến từ đó","Tên người dùng","Method của request"],ans:1,level:"th"},
+        {q:"filter_var($age, FILTER_VALIDATE_INT) trả về false khi nào?",opts:["$age là số âm","$age không phải số nguyên","$age lớn hơn 100","$age bằng 0"],ans:1,level:"th"},
+        {q:"Cho form có input name='email', method='post'. Cách lấy giá trị đúng là gì?",opts:["$_GET['email']","$_POST['email']","$_FORM['email']","$_INPUT['email']"],ans:1,level:"vd"},
+        {q:"Để lưu tên người dùng vào session sau khi đăng nhập, code đúng là gì?",opts:["cookie('user','admin')","$_SESSION['user'] = 'admin'","session('user','admin')","save_session('user','admin')"],ans:1,level:"vd"},
+        {q:"Để kiểm tra loại file upload, nên kiểm tra thuộc tính nào trong $_FILES?",opts:["$_FILES['f']['name']","$_FILES['f']['type'] hoặc extension","$_FILES['f']['size']","$_FILES['f']['error']"],ans:1,level:"vd"},
+        {q:"Khi nào nên dùng Cookie thay vì Session?",opts:["Lưu thông tin nhạy cảm","Lưu thông tin cần tồn tại sau khi đóng trình duyệt","Lưu mật khẩu","Lưu toàn bộ giỏ hàng"],ans:1,level:"vd"},
+        {q:"Code nào đúng để xóa một cookie trong PHP?",opts:["delete_cookie('name')","setcookie('name','',time()-3600)","$_COOKIE['name'] = ''","unset($_COOKIE['name'])"],ans:1,level:"vd"},
+        {q:"Validation server-side khác client-side (JavaScript) như thế nào?",opts:["Server-side nhanh hơn","Server-side không thể bị bỏ qua, client-side có thể bị tắt","Client-side an toàn hơn","Không có sự khác biệt"],ans:1,level:"vd"},
+        {q:"Để giới hạn kích thước file upload trong PHP, cần kiểm tra gì?",opts:["$_FILES['f']['name']","$_FILES['f']['size'] <= MAX_SIZE","$_FILES['f']['type']","$_FILES['f']['error']"],ans:1,level:"vd"},
+        {q:"Cho code: setcookie('theme','dark',time()+86400). Cookie này tồn tại trong bao lâu?",opts:["1 giờ","1 ngày","1 tuần","1 tháng"],ans:1,level:"vd"},
+        {q:"Tại sao cần gọi session_start() ở đầu mỗi trang sử dụng session?",opts:["Để tạo session mới","Để kết nối với session hiện có và đọc $_SESSION","Để lưu session","Để xóa session cũ"],ans:1,level:"vd"},
+        {q:"Khi form submit, cách kiểm tra request là POST hay không trong PHP?",opts:["if($_POST)","if($_SERVER['REQUEST_METHOD'] === 'POST')","if(isset($_POST))","Cả B và C đều đúng"],ans:3,level:"vd"},
+        {q:"Để ngăn người dùng gửi form nhiều lần (double submit), kỹ thuật nào phù hợp?",opts:["Dùng GET","Redirect sau khi xử lý POST (PRG pattern)","Tắt nút submit","Dùng AJAX"],ans:1,level:"vd"},
+        {q:"htmlspecialchars() dùng khi nào trong xử lý form?",opts:["Khi lưu vào DB","Khi hiển thị dữ liệu người dùng nhập ra HTML để ngăn XSS","Khi validate email","Khi upload file"],ans:1,level:"vd"},
+        {q:"Hàm isset() và empty() khác nhau như thế nào?",opts:["Giống nhau","isset kiểm tra tồn tại, empty kiểm tra rỗng/false","empty nhanh hơn","isset chỉ dùng với mảng"],ans:1,level:"vd"},
+        {q:"Để đọc giá trị session và unset một key cụ thể, code đúng là gì?",opts:["session_unset('key')","unset($_SESSION['key'])","$_SESSION['key'] = null","delete_session('key')"],ans:1,level:"vd"},
+      ]
+    },
+    {
+      id:3,
+      title:"Quản lý dữ liệu MySQL",
+      questions:[
+        {q:"MySQL là loại phần mềm gì?",opts:["Web server","Hệ quản trị cơ sở dữ liệu quan hệ (RDBMS)","Ngôn ngữ lập trình","Framework PHP"],ans:1,level:"nb"},
+        {q:"PRIMARY KEY trong database có đặc điểm gì?",opts:["Có thể trùng","Phải là số nguyên","Duy nhất và không NULL","Có thể NULL"],ans:2,level:"nb"},
+        {q:"Câu lệnh SQL nào dùng để lấy dữ liệu?",opts:["INSERT","UPDATE","SELECT","DELETE"],ans:2,level:"nb"},
+        {q:"PDO trong PHP viết tắt của gì?",opts:["PHP Data Object","PHP Database Operation","PHP Data Output","PHP Dynamic Object"],ans:0,level:"nb"},
+        {q:"Câu lệnh SQL nào thêm dữ liệu vào bảng?",opts:["SELECT","UPDATE","DELETE","INSERT INTO"],ans:3,level:"nb"},
+        {q:"FOREIGN KEY dùng để làm gì?",opts:["Tăng tốc truy vấn","Liên kết hai bảng với nhau","Mã hóa dữ liệu","Tạo backup"],ans:1,level:"nb"},
+        {q:"Hàm nào dùng để thực thi câu truy vấn với PDO?",opts:["execute()","query()","run()","Cả A và B đều đúng"],ans:3,level:"nb"},
+        {q:"fetchAll() trong PDO trả về gì?",opts:["Một hàng dữ liệu","Tất cả hàng dữ liệu dưới dạng mảng","Số lượng hàng","Null"],ans:1,level:"nb"},
+        {q:"Câu lệnh SQL nào cập nhật dữ liệu?",opts:["INSERT","MODIFY","UPDATE","ALTER"],ans:2,level:"nb"},
+        {q:"DSN trong kết nối PDO là gì?",opts:["Data Source Name - chuỗi chứa thông tin kết nối","Database Server Node","Dynamic SQL Name","Data Schema Number"],ans:0,level:"nb"},
+        {q:"Câu lệnh DROP TABLE làm gì?",opts:["Xóa dữ liệu trong bảng","Xóa hoàn toàn bảng","Đổi tên bảng","Tạo bảng mới"],ans:1,level:"nb"},
+        {q:"PDO::FETCH_ASSOC trả về kết quả dưới dạng nào?",opts:["Mảng indexed","Mảng kết hợp với tên cột là key","Object","Chuỗi JSON"],ans:1,level:"nb"},
+        {q:"Câu lệnh nào xóa dữ liệu trong bảng nhưng giữ cấu trúc bảng?",opts:["DROP TABLE","DELETE","TRUNCATE","Cả B và C đều đúng"],ans:3,level:"nb"},
+        {q:"Phương thức prepare() trong PDO dùng để làm gì?",opts:["Kết nối database","Chuẩn bị một câu truy vấn có tham số","Đóng kết nối","Fetch dữ liệu"],ans:1,level:"nb"},
+        {q:"Kiểu dữ liệu VARCHAR trong MySQL dùng để lưu gì?",opts:["Số nguyên","Chuỗi ký tự có độ dài thay đổi","Ngày tháng","Số thực"],ans:1,level:"nb"},
+        {q:"INDEX trong MySQL có tác dụng gì?",opts:["Mã hóa dữ liệu","Tăng tốc độ truy vấn tìm kiếm","Giảm dung lượng lưu trữ","Tạo backup tự động"],ans:1,level:"nb"},
+        {q:"Tại sao PDO được ưu tiên hơn hàm mysql_* cũ?",opts:["PDO nhanh hơn","PDO hỗ trợ nhiều database, hỗ trợ prepared statements, bảo mật hơn","PDO dễ code hơn","PDO miễn phí"],ans:1,level:"th"},
+        {q:"Prepared statements ngăn chặn SQL Injection như thế nào?",opts:["Mã hóa toàn bộ query","Tách biệt SQL code và data, data không được parse như SQL","Xóa ký tự đặc biệt","Dùng HTTPS"],ans:1,level:"th"},
+        {q:"Sự khác biệt giữa WHERE và HAVING trong SQL là gì?",opts:["Không khác nhau","WHERE lọc trước khi nhóm, HAVING lọc sau GROUP BY","HAVING nhanh hơn","WHERE chỉ dùng với SELECT"],ans:1,level:"th"},
+        {q:"Tại sao cần đóng kết nối PDO sau khi dùng xong?",opts:["Bắt buộc phải đóng","Giải phóng tài nguyên, tốt khi dùng connection lâu","Không cần thiết","Để tránh lỗi syntax"],ans:1,level:"th"},
+        {q:"JOIN trong SQL dùng để làm gì?",opts:["Tách bảng","Kết hợp dữ liệu từ nhiều bảng","Sắp xếp dữ liệu","Xóa dữ liệu trùng"],ans:1,level:"th"},
+        {q:"INNER JOIN khác LEFT JOIN ở điểm nào?",opts:["INNER nhanh hơn","INNER chỉ lấy hàng khớp cả hai bảng, LEFT lấy tất cả hàng bảng trái","LEFT JOIN chỉ dùng cho admin","Không khác nhau"],ans:1,level:"th"},
+        {q:"Khi nào dùng PDO::query() và khi nào dùng prepare()/execute()?",opts:["Dùng query() khi nhanh hơn","query() cho truy vấn tĩnh, prepare() khi có input người dùng","Dùng prepare() luôn luôn","Dùng query() luôn luôn"],ans:1,level:"th"},
+        {q:"Sự khác biệt giữa DELETE và TRUNCATE là gì?",opts:["Không khác nhau","DELETE xóa từng hàng (có thể WHERE), TRUNCATE xóa toàn bộ nhanh hơn","TRUNCATE xóa cả cấu trúc bảng","DELETE không hỗ trợ WHERE"],ans:1,level:"th"},
+        {q:"AUTO_INCREMENT trong MySQL dùng để làm gì?",opts:["Tự động backup","Tự động tăng giá trị số nguyên (thường dùng cho ID)","Tự động index","Tự động kết nối"],ans:1,level:"th"},
+        {q:"try-catch khi kết nối PDO dùng để làm gì?",opts:["Tăng tốc kết nối","Bắt và xử lý lỗi kết nối database","Tắt cảnh báo","Tối ưu query"],ans:1,level:"th"},
+        {q:"GROUP BY trong SQL dùng để làm gì?",opts:["Sắp xếp kết quả","Nhóm các hàng có cùng giá trị để dùng với hàm tổng hợp","Lọc dữ liệu","Giới hạn kết quả"],ans:1,level:"th"},
+        {q:"Để kết nối PDO và bật exception khi lỗi, option nào cần thêm?",opts:["PDO::ATTR_ERRMODE => PDO::ERRMODE_SILENT","PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION","PDO::ATTR_TIMEOUT => 30","PDO::ATTR_DEBUG => true"],ans:1,level:"th"},
+        {q:"Câu SQL đúng để lấy 10 sản phẩm đắt nhất là gì?",opts:["SELECT * FROM products LIMIT 10","SELECT * FROM products ORDER BY price DESC LIMIT 10","SELECT TOP 10 FROM products","SELECT * FROM products WHERE price > 0 LIMIT 10"],ans:1,level:"vd"},
+        {q:"Code PDO đúng để đếm số người dùng trong bảng users là gì?",opts:["$pdo->count('users')","$stmt=$pdo->query('SELECT COUNT(*) FROM users'); $count=$stmt->fetchColumn()","SELECT COUNT users","$pdo->select('COUNT(*) FROM users')"],ans:1,level:"vd"},
+        {q:"Để lấy tất cả sản phẩm theo danh mục ID=3, câu SQL đúng là gì?",opts:["SELECT * FROM products WHERE category=3","SELECT * FROM products WHERE category_id=3","SELECT category_id=3 FROM products","SELECT * products WHERE id=3"],ans:1,level:"vd"},
+        {q:"Code prepared statement đúng để insert user mới là gì?",opts:["$pdo->query(\"INSERT INTO users VALUES ('$name','$email')\")", "$stmt=$pdo->prepare('INSERT INTO users(name,email) VALUES(?,?)'); $stmt->execute([$name,$email])","$pdo->insert('users',[$name,$email])","INSERT INTO users($name,$email)"],ans:1,level:"vd"},
+        {q:"Để cập nhật email của user có id=5, câu SQL đúng là gì?",opts:["UPDATE users SET email='new@x.com'","UPDATE users SET email='new@x.com' WHERE id=5","MODIFY users email='new@x.com' WHERE id=5","SET users.email='new@x.com' WHERE id=5"],ans:1,level:"vd"},
+        {q:"fetchAll(PDO::FETCH_ASSOC) khác fetch(PDO::FETCH_ASSOC) ở điểm nào?",opts:["Không khác","fetchAll trả về tất cả hàng, fetch chỉ trả về một hàng","fetch nhanh hơn với nhiều dữ liệu","fetchAll chỉ dùng với SELECT"],ans:1,level:"vd"},
+        {q:"Để xóa sản phẩm có id=10 bằng prepared statement, code đúng là gì?",opts:["$pdo->query('DELETE FROM products WHERE id=10')", "$stmt=$pdo->prepare('DELETE FROM products WHERE id=?'); $stmt->execute([10])","DELETE products WHERE id=10","$pdo->delete('products',10)"],ans:1,level:"vd"},
+        {q:"Kết quả của câu SELECT COUNT(*) FROM orders WHERE status='done' là gì?",opts:["Tên các đơn hàng done","Số lượng đơn hàng có status là done","Danh sách đơn hàng","Tổng giá trị"],ans:1,level:"vd"},
+        {q:"Cấu trúc DSN đúng cho MySQL với PDO là gì?",opts:["mysql:host=localhost;dbname=mydb","mysql://localhost/mydb","localhost:mysql:mydb","mydb@localhost:mysql"],ans:0,level:"vd"},
+        {q:"Tại sao không nên dùng SELECT * trong production?",opts:["SELECT * lỗi cú pháp","Lấy dữ liệu thừa, tốn băng thông và RAM, khó maintain","Server từ chối","Không an toàn"],ans:1,level:"vd"},
+        {q:"Để lấy giá trị của một cột duy nhất, nên dùng phương thức nào của PDO?",opts:["fetch()","fetchAll()","fetchColumn()","fetchOne()"],ans:2,level:"vd"},
+        {q:"Câu SQL nào đúng để lấy tổng doanh thu theo từng tháng?",opts:["SELECT month, total FROM orders","SELECT MONTH(created_at), SUM(total) FROM orders GROUP BY MONTH(created_at)","SELECT SUM(total) FROM orders","SELECT * FROM orders ORDER BY month"],ans:1,level:"vd"},
+      ]
+    },
+    {
+      id:4,
+      title:"Mô hình MVC và OOP",
+      questions:[
+        {q:"OOP là viết tắt của gì?",opts:["Object Oriented PHP","Object Oriented Programming","Output Oriented Process","Online Object Platform"],ans:1,level:"nb"},
+        {q:"Class trong PHP là gì?",opts:["Một hàm đặc biệt","Khuôn mẫu/bản thiết kế để tạo object","Một biến đặc biệt","Một file PHP"],ans:1,level:"nb"},
+        {q:"Từ khóa nào dùng để tạo object từ class?",opts:["create","make","new","build"],ans:2,level:"nb"},
+        {q:"Constructor trong PHP là gì?",opts:["Hàm hủy object","Hàm tự động gọi khi tạo object mới","Hàm static","Hàm trả về giá trị"],ans:1,level:"nb"},
+        {q:"Access modifier nào cho phép truy cập từ bên ngoài class?",opts:["private","protected","public","internal"],ans:2,level:"nb"},
+        {q:"MVC là viết tắt của gì?",opts:["Model View Controller","Multiple View Components","Main View Class","Module View Controller"],ans:0,level:"nb"},
+        {q:"Model trong MVC chịu trách nhiệm về gì?",opts:["Hiển thị giao diện","Logic nghiệp vụ và tương tác với database","Nhận request từ user","Routing URL"],ans:1,level:"nb"},
+        {q:"View trong MVC chịu trách nhiệm về gì?",opts:["Xử lý dữ liệu","Kết nối database","Hiển thị giao diện người dùng","Nhận request"],ans:2,level:"nb"},
+        {q:"Controller trong MVC chịu trách nhiệm về gì?",opts:["Lưu dữ liệu","Hiển thị HTML","Nhận request, gọi Model, truyền data cho View","Kết nối database"],ans:2,level:"nb"},
+        {q:"Kế thừa trong OOP dùng từ khóa nào trong PHP?",opts:["implements","extends","inherits","super"],ans:1,level:"nb"},
+        {q:"Từ khóa $this trong PHP dùng để làm gì?",opts:["Tham chiếu đến class cha","Tham chiếu đến object hiện tại","Tham chiếu đến static member","Tạo object mới"],ans:1,level:"nb"},
+        {q:"Composer trong PHP dùng để làm gì?",opts:["Viết code PHP","Quản lý thư viện và autoloading","Compile PHP","Tạo database"],ans:1,level:"nb"},
+        {q:"Autoloading trong PHP giúp gì?",opts:["Tự động load CSS","Tự động include file class khi cần mà không cần require thủ công","Tự động tạo object","Tự động backup"],ans:1,level:"nb"},
+        {q:"Access modifier protected cho phép truy cập ở đâu?",opts:["Mọi nơi","Chỉ trong class đó và class con","Chỉ trong class đó","Chỉ từ bên ngoài"],ans:1,level:"nb"},
+        {q:"Interface trong PHP là gì?",opts:["Một class đặc biệt","Hợp đồng định nghĩa các method bắt buộc phải implement","Một biến toàn cục","Một hàm đặc biệt"],ans:1,level:"nb"},
+        {q:"Encapsulation trong OOP có nghĩa là gì?",opts:["Kế thừa class","Đóng gói dữ liệu và method, kiểm soát truy cập qua access modifiers","Tạo nhiều object","Gọi method từ class khác"],ans:1,level:"nb"},
+        {q:"Method __destruct() trong PHP được gọi khi nào?",opts:["Khi tạo object","Khi object bị xóa hoặc script kết thúc","Khi gọi hàm bất kỳ","Khi lỗi xảy ra"],ans:1,level:"nb"},
+        {q:"Tại sao MVC giúp dễ bảo trì code hơn?",opts:["Code ngắn hơn","Tách biệt logic, giao diện và dữ liệu giúp thay đổi một phần không ảnh hưởng phần khác","Chạy nhanh hơn","Ít file hơn"],ans:1,level:"th"},
+        {q:"Sự khác biệt giữa private và protected là gì?",opts:["Không khác","Private chỉ trong class đó, protected cho cả class con","protected nhanh hơn","private dùng cho static"],ans:1,level:"th"},
+        {q:"Khi nào nên dùng static method thay vì instance method?",opts:["Luôn luôn","Khi method không cần truy cập thuộc tính của object cụ thể","Khi method xử lý dữ liệu lớn","Khi cần kế thừa"],ans:1,level:"th"},
+        {q:"Tại sao Model không nên chứa code HTML?",opts:["HTML chậm hơn PHP","Tách biệt trách nhiệm: Model xử lý dữ liệu, View xử lý hiển thị","HTML không hợp lệ trong PHP","Model không đọc được HTML"],ans:1,level:"th"},
+        {q:"Method __toString() trong PHP dùng để làm gì?",opts:["Xóa object","Định nghĩa cách hiển thị object khi echo hoặc chuyển thành string","Sao chép object","Serialize object"],ans:1,level:"th"},
+        {q:"Autoloading PSR-4 yêu cầu gì về tên class và file?",opts:["Tùy ý","Tên class phải khớp với tên file và cấu trúc namespace phải khớp thư mục","Tất cả class trong một file","Tên class phải viết hoa"],ans:1,level:"th"},
+        {q:"Trong MVC, khi nào Controller gọi View?",opts:["Ngay khi nhận request","Sau khi nhận request từ user và lấy data từ Model","Trước khi gọi Model","Khi database lỗi"],ans:1,level:"th"},
+        {q:"Tại sao OOP giúp tái sử dụng code hiệu quả hơn?",opts:["Code ngắn hơn","Kế thừa cho phép class con dùng lại code của class cha","OOP compile nhanh hơn","OOP không cần hàm"],ans:1,level:"th"},
+        {q:"Phân biệt Abstract class và Interface trong PHP:",opts:["Không khác nhau","Abstract class có thể có method với body, Interface chỉ có khai báo","Interface nhanh hơn","Abstract class không dùng được trong PHP"],ans:1,level:"th"},
+        {q:"Magic method __construct() được gọi khi nào?",opts:["Khi destroy object","Khi tạo object mới với new","Khi gọi static method","Khi clone object"],ans:1,level:"th"},
+        {q:"Trong MVC, Router có nhiệm vụ gì?",opts:["Lưu dữ liệu","Phân tích URL và điều hướng đến Controller phù hợp","Render HTML","Kết nối database"],ans:1,level:"th"},
+        {q:"Polymorphism trong OOP nghĩa là gì?",opts:["Tạo nhiều class","Cùng method nhưng hành vi khác nhau tùy object","Kế thừa nhiều cấp","Không dùng được trong PHP"],ans:1,level:"th"},
+        {q:"Trait trong PHP dùng để làm gì?",opts:["Thay thế class","Tái sử dụng code trong nhiều class không có quan hệ kế thừa","Tạo interface","Khai báo hằng số"],ans:1,level:"th"},
+        {q:"Code OOP đúng để định nghĩa class Product có thuộc tính name và price là gì?",opts:["class Product { var name; var price; }","class Product { public $name; public $price; }","Product { $name; $price; }","define Product($name,$price){}"],ans:1,level:"vd"},
+        {q:"Để tạo object từ class User và truyền tên, code đúng là gì?",opts:["User.create('John')","$user = new User('John')","$user = User('John')","create User('John')"],ans:1,level:"vd"},
+        {q:"Trong pattern MVC, file nào nên xử lý câu truy vấn SELECT từ database?",opts:["View","Controller","Model","index.php"],ans:2,level:"vd"},
+        {q:"Class Animal có method speak(). Class Dog extends Animal. Khi Dog không override speak(), gọi $dog->speak() sẽ?",opts:["Lỗi","Gọi speak() của Animal","Không làm gì","Tạo method mới"],ans:1,level:"vd"},
+        {q:"Cấu trúc thư mục MVC chuẩn thường gồm các thư mục nào?",opts:["css, js, images","app/Models, app/Views, app/Controllers","include, function, html","src, build, dist"],ans:1,level:"vd"},
+        {q:"Code đúng để gọi static method calculate() trong class Math là gì?",opts:["$math = new Math(); $math->calculate()","Math::calculate()","Math.calculate()","call Math::calculate()"],ans:1,level:"vd"},
+        {q:"Để class Car extends Vehicle và override method move(), code đúng là gì?",opts:["override function move(){}","public function move(){ /* new logic */ }","redefine move(){}","function override_move(){}"],ans:1,level:"vd"},
+        {q:"composer.json dùng để làm gì trong dự án PHP?",opts:["Cấu hình database","Khai báo dependencies và autoloading của dự án","Cấu hình web server","Lưu session"],ans:1,level:"vd"},
+        {q:"Cho class User { private $name; } Cách đúng để đọc $name từ bên ngoài là gì?",opts:["echo $user->name","Tạo public method getName() { return $this->name; }","$user::name","Không thể đọc được"],ans:1,level:"vd"},
+        {q:"new self() và new static() khác nhau như thế nào?",opts:["Không khác","new self() tạo instance của class hiện tại, new static() tạo instance của class gọi (hữu ích khi kế thừa)","new static() nhanh hơn","new self() chỉ dùng trong constructor"],ans:1,level:"vd"},
+      ]
+    },
+    {
+      id:5,
+      title:"Bảo mật website",
+      questions:[
+        {q:"SQL Injection là gì?",opts:["Lỗi cú pháp SQL","Tấn công chèn câu lệnh SQL vào input để thao túng database","Lỗi kết nối database","Cấu hình sai MySQL"],ans:1,level:"nb"},
+        {q:"XSS là viết tắt của gì?",opts:["Extra Style Sheet","Cross-Site Scripting","Cross-Site Session","External Script Source"],ans:1,level:"nb"},
+        {q:"CSRF là gì?",opts:["Caching Request Format","Cross-Site Request Forgery","Custom Server Response Filter","Client-Side Request Form"],ans:1,level:"nb"},
+        {q:"Hàm password_hash() trong PHP dùng để làm gì?",opts:["So sánh mật khẩu","Mã hóa mật khẩu an toàn","Tạo mật khẩu ngẫu nhiên","Giải mã mật khẩu"],ans:1,level:"nb"},
+        {q:"Hàm htmlspecialchars() dùng để làm gì?",opts:["Xóa HTML","Chuyển ký tự đặc biệt HTML thành entities, ngăn XSS","Thêm HTML","Validate HTML"],ans:1,level:"nb"},
+        {q:"HTTPS khác HTTP ở điểm gì?",opts:["HTTPS nhanh hơn","HTTPS mã hóa dữ liệu truyền tải bằng SSL/TLS","HTTPS không cần server","HTTPS miễn phí hơn"],ans:1,level:"nb"},
+        {q:"Prepared statements ngăn SQL Injection bằng cách nào?",opts:["Mã hóa toàn bộ query","Tách SQL code và data, input không được interpret như SQL","Chặn kết nối","Xóa ký tự đặc biệt"],ans:1,level:"nb"},
+        {q:"Hàm password_verify() dùng để làm gì?",opts:["Tạo hash mới","Kiểm tra mật khẩu nhập vào có khớp với hash đã lưu","Đổi mật khẩu","Xóa mật khẩu"],ans:1,level:"nb"},
+        {q:"CSRF token là gì?",opts:["Token đăng nhập","Chuỗi ngẫu nhiên gắn vào form để xác nhận request hợp lệ","Cookie bảo mật","Session ID"],ans:1,level:"nb"},
+        {q:"strip_tags() trong PHP làm gì?",opts:["Thêm HTML tag","Xóa toàn bộ HTML và PHP tags khỏi chuỗi","Validate tag","Mã hóa tag"],ans:1,level:"nb"},
+        {q:"Thuật toán nào được PHP khuyến nghị dùng trong password_hash()?",opts:["MD5","SHA1","PASSWORD_BCRYPT hoặc PASSWORD_DEFAULT","SHA256"],ans:2,level:"nb"},
+        {q:"Tại sao không nên dùng MD5 để hash mật khẩu?",opts:["MD5 chậm","MD5 không còn an toàn, dễ bị brute-force và rainbow table","MD5 không có trong PHP","MD5 quá dài"],ans:1,level:"nb"},
+        {q:"Error reporting nên được tắt trên môi trường production vì sao?",opts:["Tốn tài nguyên","Tránh lộ thông tin hệ thống cho kẻ tấn công","Làm chậm server","Không cần thiết"],ans:1,level:"nb"},
+        {q:"Lỗ hổng XSS xảy ra khi nào?",opts:["Server bị hack","Ứng dụng hiển thị input người dùng mà không escape, cho phép chạy script độc hại","Database bị xóa","File bị đánh cắp"],ans:1,level:"nb"},
+        {q:"Input filtering trong PHP dùng để làm gì?",opts:["Làm sạch và kiểm tra dữ liệu đầu vào trước khi xử lý","Lọc file","Kiểm tra IP","Mã hóa output"],ans:0,level:"nb"},
+        {q:"Tại sao cần validate input cả ở client và server?",opts:["Client validation đủ rồi","Client validation dễ bypass, server validation là bắt buộc để bảo mật thực sự","Server validation chậm","Để code đẹp hơn"],ans:1,level:"th"},
+        {q:"Phân biệt authentication và authorization:",opts:["Giống nhau","Authentication xác thực danh tính, authorization kiểm tra quyền truy cập","Authorization nhanh hơn","Authentication chỉ dùng với admin"],ans:1,level:"th"},
+        {q:"SQL Injection có thể gây ra hậu quả gì nghiêm trọng nhất?",opts:["Làm chậm website","Đọc, sửa, xóa toàn bộ database hoặc bypass login","Làm hỏng giao diện","Chặn email"],ans:1,level:"th"},
+        {q:"Tại sao nên dùng HTTPS thay vì HTTP cho trang có form đăng nhập?",opts:["HTTPS nhanh hơn","Mã hóa dữ liệu đăng nhập, ngăn chặn nghe lén (man-in-the-middle)","HTTPS bắt buộc theo luật","HTTPS miễn phí"],ans:1,level:"th"},
+        {q:"Stored XSS khác Reflected XSS ở điểm nào?",opts:["Không khác","Stored XSS lưu script vào database, ảnh hưởng nhiều người; Reflected chỉ qua URL","Reflected nguy hiểm hơn","Stored XSS không nguy hiểm"],ans:1,level:"th"},
+        {q:"Tại sao không nên hiển thị chi tiết lỗi database ra browser trong production?",opts:["Tốn dung lượng","Lộ cấu trúc database, thông tin kết nối cho kẻ tấn công","Làm chậm tải trang","Người dùng khó hiểu"],ans:1,level:"th"},
+        {q:"CSRF attack hoạt động như thế nào?",opts:["Hack trực tiếp server","Lừa trình duyệt nạn nhân gửi request đến site đang đăng nhập mà họ không hay biết","Đọc cookie người dùng","Chặn kết nối mạng"],ans:1,level:"th"},
+        {q:"Bcrypt trong password hashing có đặc điểm gì?",opts:["Nhanh nhất","Có cost factor, chậm có chủ ý để chống brute-force","Không reversible và không có salt","Ngắn nhất"],ans:1,level:"th"},
+        {q:"Nguyên tắc Least Privilege trong bảo mật có nghĩa là gì?",opts:["Dùng ít code nhất","Mỗi thành phần chỉ có quyền tối thiểu cần thiết để hoạt động","Ít người dùng nhất","Ít server nhất"],ans:1,level:"th"},
+        {q:"Tại sao cần sanitize output khi hiển thị dữ liệu người dùng?",opts:["Để format đẹp hơn","Ngăn XSS bằng cách escape ký tự HTML đặc biệt trước khi hiển thị","Để tăng tốc độ","Để lưu vào database"],ans:1,level:"th"},
+        {q:"File inclusion vulnerability xảy ra khi nào?",opts:["Include file CSS","Dùng input người dùng trực tiếp trong include/require mà không validate","Dùng quá nhiều include","Include file không tồn tại"],ans:1,level:"th"},
+        {q:"Rate limiting dùng để ngăn chặn loại tấn công nào?",opts:["SQL Injection","Brute-force tấn công login và DDoS","XSS","CSRF"],ans:1,level:"th"},
+        {q:"Cách đúng để hash mật khẩu trong PHP là gì?",opts:["md5($password)","sha1($password)","password_hash($password, PASSWORD_DEFAULT)","base64_encode($password)"],ans:2,level:"vd"},
+        {q:"Code đúng để ngăn XSS khi hiển thị input người dùng là gì?",opts:["echo $input","echo strip_tags($input)","echo htmlspecialchars($input, ENT_QUOTES, 'UTF-8')","echo addslashes($input)"],ans:2,level:"vd"},
+        {q:"Đoạn code nào có lỗ hổng SQL Injection?",opts:["$stmt=$pdo->prepare('SELECT * FROM users WHERE id=?'); $stmt->execute([$id])","$sql=\"SELECT * FROM users WHERE id=$id\"; $pdo->query($sql)","Cả hai đều an toàn","Không đoạn nào"],ans:1,level:"vd"},
+        {q:"Code đúng để kiểm tra mật khẩu khi đăng nhập là gì?",opts:["if($input == $storedHash)","if(password_verify($input, $storedHash))","if(md5($input) == $storedHash)","if($input === $storedHash)"],ans:1,level:"vd"},
+        {q:"Để tạo CSRF token và lưu vào session, code đúng là gì?",opts:["$token = 'csrf123'","$token=bin2hex(random_bytes(32)); $_SESSION['csrf']=$token","$token=time()","$token=session_id()"],ans:1,level:"vd"},
+        {q:"Khi nhận form POST, cách verify CSRF token đúng là gì?",opts:["Kiểm tra $_POST['token'] !== null","hash_equals($_SESSION['csrf'], $_POST['token'])","$_POST['token'] == 'csrf'","Không cần verify"],ans:1,level:"vd"},
+        {q:"Để ngăn hiển thị lỗi PHP trong production, cần đặt gì trong php.ini?",opts:["display_errors = On","display_errors = Off; log_errors = On","error_reporting = 0","Tắt PHP"],ans:1,level:"vd"},
+        {q:"Code nào an toàn để lấy ID từ URL và truy vấn database?",opts:["$id=$_GET['id']; $pdo->query(\"SELECT * FROM p WHERE id=$id\")","$id=(int)$_GET['id']; $stmt=$pdo->prepare('SELECT * FROM p WHERE id=?'); $stmt->execute([$id])","$id=htmlspecialchars($_GET['id']); $pdo->query('SELECT * FROM p WHERE id='.$id)","Tất cả đều an toàn"],ans:1,level:"vd"},
+        {q:"Whitelist vs Blacklist validation: cách nào an toàn hơn?",opts:["Blacklist","Whitelist - chỉ cho phép giá trị biết trước là hợp lệ","Cả hai như nhau","Không dùng cái nào"],ans:1,level:"vd"},
+        {q:"Sau khi gọi password_hash(), lưu kết quả vào database cần cột có độ dài tối thiểu bao nhiêu?",opts:["32 ký tự","60 ký tự (khuyến nghị 255 để tương lai)","16 ký tự","100 ký tự"],ans:1,level:"vd"},
+        {q:"Tại sao nên dùng HTTPS với flag Secure cho Cookie?",opts:["Cookie nhanh hơn","Cookie chỉ được gửi qua kết nối HTTPS, ngăn bị đánh cắp qua HTTP","Cookie được mã hóa","Cookie sống lâu hơn"],ans:1,level:"th"},
+        {q:"Content Security Policy (CSP) header dùng để làm gì?",opts:["Tăng tốc tải trang","Kiểm soát nguồn tài nguyên được phép tải, giảm nguy cơ XSS","Nén file CSS","Cache tài nguyên"],ans:1,level:"th"},
+        {q:"Prepared statement với named parameters trong PDO dùng cú pháp nào?",opts:["SELECT * FROM u WHERE id=?","SELECT * FROM u WHERE id=:id","SELECT * FROM u WHERE id=$id","SELECT * FROM u WHERE id=@id"],ans:1,level:"vd"},
+      ]
+    }
+  ]
+};
+
+let state = {view:'home', chapterIdx:null, qIdx:0, answers:{}, submitted:false};
+
+function render(){
+  const s = document.getElementById('screen');
+  if(state.view==='home') s.innerHTML = renderHome();
+  else if(state.view==='quiz') s.innerHTML = renderQuiz();
+  else if(state.view==='result') s.innerHTML = renderResult();
+  attachEvents();
+}
+
+function renderHome(){
+  return `<div>
+    <h1>Ôn tập Lập trình PHP</h1>
+    <p class="subtitle">5 chương &middot; 40 câu/chương &middot; Nhận biết · Thông hiểu · Vận dụng</p>
+    <div class="chapters-grid">
+      ${DATA.chapters.map((ch,i)=>`
+        <div class="ch-card" data-ch="${i}">
+          <div class="ch-badge">Chương ${ch.id}</div>
+          <div class="ch-title">${ch.title}</div>
+          <div class="ch-meta">40 câu hỏi &middot; Nhấn để bắt đầu</div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function renderQuiz(){
+  const ch = DATA.chapters[state.chapterIdx];
+  const q = ch.questions[state.qIdx];
+  const ans = state.answers;
+  const levelMap = {nb:'Nhận biết',th:'Thông hiểu',vd:'Vận dụng'};
+  const levelClass = {nb:'lvl-nb',th:'lvl-th',vd:'lvl-vd'};
+  const answered = ans[state.qIdx] !== undefined;
+  const userAns = ans[state.qIdx];
+  const progress = Math.round((state.qIdx+1)/ch.questions.length*100);
+  return `<div class="quiz-wrap">
+    <div class="quiz-nav">
+      <button class="nav-btn" id="btn-home">← Trang chủ</button>
+      <div class="quiz-title">Chương ${ch.id}: ${ch.title}</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+    <div class="quiz-body">
+      <div class="q-card">
+        <div class="q-num">Câu hỏi ${state.qIdx+1} / ${ch.questions.length}</div>
+        <span class="q-level ${levelClass[q.level]}">${levelMap[q.level]}</span>
+        <div class="q-text">${q.q}</div>
+        <div class="options">
+          ${q.opts.map((opt,i)=>{
+            let cls='opt-btn';
+            if(answered){
+              if(i===q.ans) cls+=' correct';
+              else if(i===userAns && userAns!==q.ans) cls+=' wrong';
+            }
+            return `<button class="${cls}" data-oidx="${i}" ${answered?'disabled':''}>${String.fromCharCode(65+i)}. ${opt}</button>`;
+          }).join('')}
+        </div>
+        ${answered?`<div class="feedback ${userAns===q.ans?'fb-correct':'fb-wrong'}">${userAns===q.ans?'✓ Chính xác!':'✗ Sai rồi! Đáp án đúng: '+String.fromCharCode(65+q.ans)+'. '+q.opts[q.ans]}</div>`:''}
+        <div class="q-controls">
+          <button class="ctrl-btn" id="btn-prev" ${state.qIdx===0?'disabled':''}>← Trước</button>
+          <button class="ctrl-btn primary" id="btn-next">${state.qIdx===ch.questions.length-1?'Xem kết quả →':'Câu tiếp →'}</button>
+        </div>
+      </div>
+      <div class="sidebar">
+        <h3>Danh sách câu hỏi</h3>
+        <div class="q-grid">
+          ${ch.questions.map((_,i)=>{
+            let cls='q-dot';
+            if(i===state.qIdx) cls+=' active';
+            else if(ans[i]!==undefined) cls+=ans[i]===ch.questions[i].ans?' done-c':' done-w';
+            return `<button class="${cls}" data-qjump="${i}">${i+1}</button>`;
+          }).join('')}
+        </div>
+        <button class="submit-btn" id="btn-submit">Nộp Bài Ngay</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderResult(){
+  const ch = DATA.chapters[state.chapterIdx];
+  const ans = state.answers;
+  let correct=0,wrong=0,skip=0;
+  ch.questions.forEach((q,i)=>{
+    if(ans[i]===undefined) skip++;
+    else if(ans[i]===q.ans) correct++;
+    else wrong++;
+  });
+  const total=ch.questions.length;
+  const pct=Math.round(correct/total*100);
+  const grade = pct>=80?'Giỏi 🏆':pct>=65?'Khá 👍':pct>=50?'Trung bình':'Cần cố gắng hơn';
+  return `<div class="result-wrap">
+    <div class="result-card">
+      <div style="font-size:16px;font-weight:600;color:#1a1a1a;text-align:center">Kết quả: Chương ${ch.id}</div>
+      <div class="result-score">${pct}%</div>
+      <div class="result-sub">${grade} &middot; ${correct}/${total} câu đúng</div>
+      <div class="result-stats">
+        <div class="stat-box"><div class="stat-n" style="color:#3B6D11">${correct}</div><div class="stat-l">Đúng</div></div>
+        <div class="stat-box"><div class="stat-n" style="color:#A32D2D">${wrong}</div><div class="stat-l">Sai</div></div>
+        <div class="stat-box"><div class="stat-n" style="color:#888">${skip}</div><div class="stat-l">Bỏ qua</div></div>
+      </div>
+      <div class="result-actions">
+        <button id="btn-retry" class="btn-retry">Làm lại</button>
+        <button id="btn-back-home">Về trang chủ</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function attachEvents(){
+  document.querySelectorAll('[data-ch]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      state={view:'quiz',chapterIdx:parseInt(el.dataset.ch),qIdx:0,answers:{},submitted:false};
+      render();
+    });
+  });
+  const home=document.getElementById('btn-home');
+  if(home) home.addEventListener('click',()=>{state.view='home';render();});
+  const prev=document.getElementById('btn-prev');
+  if(prev) prev.addEventListener('click',()=>{if(state.qIdx>0){state.qIdx--;render();}});
+  const next=document.getElementById('btn-next');
+  if(next) next.addEventListener('click',()=>{
+    const ch=DATA.chapters[state.chapterIdx];
+    if(state.qIdx<ch.questions.length-1){state.qIdx++;render();}
+    else{state.view='result';render();}
+  });
+  const submit=document.getElementById('btn-submit');
+  if(submit) submit.addEventListener('click',()=>{state.view='result';render();});
+  document.querySelectorAll('.opt-btn[data-oidx]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      if(state.answers[state.qIdx]===undefined){
+        state.answers[state.qIdx]=parseInt(el.dataset.oidx);
+        render();
+      }
+    });
+  });
+  document.querySelectorAll('[data-qjump]').forEach(el=>{
+    el.addEventListener('click',()=>{state.qIdx=parseInt(el.dataset.qjump);render();});
+  });
+  const retry=document.getElementById('btn-retry');
+  if(retry) retry.addEventListener('click',()=>{
+    state={view:'quiz',chapterIdx:state.chapterIdx,qIdx:0,answers:{},submitted:false};
+    render();
+  });
+  const backHome=document.getElementById('btn-back-home');
+  if(backHome) backHome.addEventListener('click',()=>{state.view='home';render();});
+}
+
+render();
+</script>
+</body>
+</html>
